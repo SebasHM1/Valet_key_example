@@ -1,36 +1,32 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden
-from django.http import JsonResponse
-from django.utils.timezone import now
-from .models import ValetKey
+from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.core.cache import cache
 import uuid
 
 # Página para solicitar clave
 def request_key(request):
     if request.method == "POST":
         file_path = "protected/sample.pdf"  # Simulación de archivo
-        valet_key = ValetKey.objects.create(file_path=file_path)
-        return render(request, "download.html", {"key": valet_key.key})
+        key = str(uuid.uuid4())  # Genera una clave única
+        expiration_time = 60  # Expira en 60 segundos
+
+        # Guarda la clave en la caché
+        cache.set(key, file_path, timeout=expiration_time)
+
+        return render(request, "download.html", {"key": key})
+
     return render(request, "request_key.html")
 
 # Descargar archivo con clave
 def download_file(request, key):
-    valet_key = get_object_or_404(ValetKey, key=key)
-    
-    if not valet_key.is_valid():
-        return HttpResponseForbidden("La clave ha expirado.")
+    file_path = cache.get(key)
 
-    return HttpResponse(f"Descargando archivo: {valet_key.file_path}")
+    if not file_path:
+        return HttpResponseForbidden("La clave ha expirado o no es válida.")
 
-from django.http import JsonResponse
-from django.utils.timezone import now
-from .models import ValetKey
+    return HttpResponse(f"Descargando archivo: {file_path}")
 
+# Verificar estado de la clave
 def check_key_status(request, key):
-    try:
-        valet_key = ValetKey.objects.get(key=key)
-        is_valid = valet_key.is_valid()
-        return JsonResponse({"valid": is_valid})
-    except ValetKey.DoesNotExist:
-        return JsonResponse({"valid": False})
-
+    is_valid = cache.get(key) is not None
+    return JsonResponse({"valid": is_valid})
