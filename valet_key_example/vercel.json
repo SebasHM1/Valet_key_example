@@ -2,10 +2,6 @@
     "version": 2,
     "builds": [
         {
-            "src": "build_files.sh",
-            "use": "@vercel/static-build"
-        },
-        {
             "src": "valet_key_example/wsgi.py",
             "use": "@vercel/python",
             "config": { "maxLambdaSize": "15mb", "runtime":"python3.11.5" }
