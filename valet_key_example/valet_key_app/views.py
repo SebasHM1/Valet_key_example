@@ -8,7 +8,7 @@ def request_key(request):
     if request.method == "POST":
         file_path = "protected/sample.pdf"  # Simulación de archivo
         key = str(uuid.uuid4())  # Genera una clave única
-        expiration_time = 60  # Expira en 60 segundos
+        expiration_time = 30  # Expira en 30 segundos
 
         # Guarda la clave en la caché
         cache.set(key, file_path, timeout=expiration_time)
