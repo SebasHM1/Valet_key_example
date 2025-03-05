@@ -1,0 +1,15 @@
+{
+    "builds": [
+      {
+        "src": "valet_key_example/wsgi.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "valet_key_example/wsgi.py"
+      }
+    ]
+  }
+  

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head><title>Solicitar Clave</title></head>
+<body>
+    <h2>Solicitar una Clave de Acceso</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Generar Clave</button>
+    </form>
+</body>
+</html>
